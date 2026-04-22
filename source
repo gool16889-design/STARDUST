@@ -8,7 +8,6 @@ local LocalPlayer = Players.LocalPlayer
 local CoreGui = game:GetService("CoreGui")
 
 local StardustLib = {}
-StardustLib.__index = StardustLib
 
 function StardustLib:CreateWindow(config)
     config = config or {}
@@ -202,252 +201,258 @@ function StardustLib:CreateWindow(config)
             TweenService:Create(Btn, TweenInfo.new(0.3), {TextColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 0.9}):Play()
         end)
 
-        tabs[name] = {Page = Page, Btn = Btn}
-        return Page
-    end
-    
-    -- === ФУНКЦИЯ ДЛЯ СОЗДАНИЯ ТОГГЛА ===
-    local function AddToggle(parent, name, default, callback)
-        local Frame = Instance.new("Frame")
-        Frame.Size = UDim2.new(1, 0, 0, 26)
-        Frame.BackgroundTransparency = 1
-        Frame.Parent = parent
-        Frame.ZIndex = 3
+        local tabData = {Page = Page, Btn = Btn}
+        tabs[name] = tabData
         
-        local Text = Instance.new("TextLabel")
-        Text.Text = name
-        Text.Font = Enum.Font.Gotham
-        Text.TextColor3 = Color3.fromRGB(180, 180, 185)
-        Text.TextSize = 13
-        Text.Size = UDim2.new(0.85, 0, 1, 0)
-        Text.BackgroundTransparency = 1
-        Text.TextXAlignment = 0
-        Text.Parent = Frame
-        Text.TextTruncate = Enum.TextTruncate.AtEnd
-        Text.ZIndex = 4
-        
-        local Sw = Instance.new("Frame")
-        Sw.Size = UDim2.new(0, 30, 0, 16)
-        Sw.Position = UDim2.new(1, -30, 0.5, -8)
-        Sw.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
-        Sw.Parent = Frame
-        Sw.ZIndex = 4
-        Instance.new("UICorner", Sw).CornerRadius = UDim.new(1, 0)
-        
-        local D = Instance.new("Frame")
-        D.Size = UDim2.new(0, 10, 0, 10)
-        D.Position = UDim2.new(0, 3, 0.5, -5)
-        D.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
-        D.Parent = Sw
-        D.ZIndex = 5
-        Instance.new("UICorner", D).CornerRadius = UDim.new(1, 0)
-        
-        local val = default or false
-        local function update()
-            local goalCol = val and Color3.fromRGB(76, 110, 245) or Color3.fromRGB(60, 60, 65)
-            local goalPos = val and UDim2.new(1, -13, 0.5, -5) or UDim2.new(0, 3, 0.5, -5)
-            TweenService:Create(D, TweenInfo.new(0.3, Enum.EasingStyle.Quart), {BackgroundColor3 = goalCol, Position = goalPos}):Play()
-            TweenService:Create(Text, TweenInfo.new(0.3), {TextColor3 = val and Color3.fromRGB(255,255,255) or Color3.fromRGB(180,180,185)}):Play()
-            if callback then callback(val) end
-        end
-        
-        Frame.InputBegan:Connect(function(i) 
-            if i.UserInputType == Enum.UserInputType.MouseButton1 then 
-                val = not val 
-                update() 
-            end 
-        end)
-        
-        update()
-        
-        return {
-            SetValue = function(value)
-                val = value
-                update()
-            end,
-            GetValue = function()
-                return val
-            end
-        }
-    end
-    
-    -- === ФУНКЦИЯ ДЛЯ СОЗДАНИЯ ДРОПДАУНА ===
-    local function AddDropdown(parent, name, options, default, callback)
-        local Frame = Instance.new("Frame")
-        Frame.Size = UDim2.new(1, 0, 0, 26)
-        Frame.BackgroundTransparency = 1
-        Frame.Parent = parent
-        Frame.ClipsDescendants = false
-        Frame.ZIndex = 3
-        
-        local Text = Instance.new("TextLabel")
-        Text.Text = name
-        Text.Font = Enum.Font.Gotham
-        Text.TextColor3 = Color3.fromRGB(180, 180, 185)
-        Text.TextSize = 13
-        Text.Size = UDim2.new(0, 100, 1, 0)
-        Text.BackgroundTransparency = 1
-        Text.TextXAlignment = 0
-        Text.Parent = Frame
-        Text.TextTruncate = Enum.TextTruncate.AtEnd
-        Text.ZIndex = 4
-        
-        local DropdownButton = Instance.new("TextButton")
-        DropdownButton.Size = UDim2.new(0, 160, 0, 26)
-        DropdownButton.Position = UDim2.new(1, -160, 0, 0)
-        DropdownButton.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
-        DropdownButton.Text = default or options[1]
-        DropdownButton.Font = Enum.Font.Gotham
-        DropdownButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        DropdownButton.TextSize = 12
-        DropdownButton.AutoButtonColor = false
-        DropdownButton.Parent = Frame
-        DropdownButton.ZIndex = 5
-        Instance.new("UICorner", DropdownButton).CornerRadius = UDim.new(0, 6)
-        
-        local Arrow = Instance.new("ImageLabel")
-        Arrow.Size = UDim2.new(0, 12, 0, 12)
-        Arrow.Position = UDim2.new(1, -18, 0.5, -6)
-        Arrow.BackgroundTransparency = 1
-        Arrow.Image = "rbxassetid://4910975533"
-        Arrow.ImageColor3 = Color3.fromRGB(150, 150, 155)
-        Arrow.Parent = DropdownButton
-        Arrow.ZIndex = 6
-        
-        local DropdownList = Instance.new("Frame")
-        DropdownList.Size = UDim2.new(0, 160, 0, 0)
-        DropdownList.Position = UDim2.new(1, -160, 1, 2)
-        DropdownList.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-        DropdownList.BorderSizePixel = 0
-        DropdownList.ClipsDescendants = true
-        DropdownList.Visible = false
-        DropdownList.Parent = Frame
-        DropdownList.ZIndex = 100
-        Instance.new("UICorner", DropdownList).CornerRadius = UDim.new(0, 6)
-        Instance.new("UIStroke", DropdownList).Color = Color3.fromRGB(35, 35, 40)
-        
-        local OptionsContainer = Instance.new("Frame")
-        OptionsContainer.Size = UDim2.new(1, -4, 1, 0)
-        OptionsContainer.Position = UDim2.new(0, 2, 0, 0)
-        OptionsContainer.BackgroundTransparency = 1
-        OptionsContainer.Parent = DropdownList
-        OptionsContainer.ZIndex = 101
-        
-        local UIListLayout = Instance.new("UIListLayout")
-        UIListLayout.Parent = OptionsContainer
-        UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        
-        local selectedValue = default or options[1]
-        local isOpen = false
-        local optionButtons = {}
-        
-        local function CloseDropdown()
-            isOpen = false
-            DropdownList.Visible = false
-            TweenService:Create(DropdownList, TweenInfo.new(0.2), {Size = UDim2.new(0, 160, 0, 0)}):Play()
-            TweenService:Create(Arrow, TweenInfo.new(0.2), {Rotation = 0}):Play()
-        end
-        
-        local function OpenDropdown()
-            isOpen = true
-            DropdownList.Visible = true
-            local listHeight = math.min(#options * 26, 156)
-            TweenService:Create(DropdownList, TweenInfo.new(0.2), {Size = UDim2.new(0, 160, 0, listHeight)}):Play()
-            TweenService:Create(Arrow, TweenInfo.new(0.2), {Rotation = 180}):Play()
-        end
-        
-        DropdownButton.MouseButton1Click:Connect(function()
-            if isOpen then
-                CloseDropdown()
-            else
-                OpenDropdown()
-            end
-        end)
-        
-        local function CreateOptions()
-            for _, btn in ipairs(optionButtons) do
-                btn:Destroy()
-            end
-            optionButtons = {}
+        -- === ФУНКЦИЯ ДЛЯ СОЗДАНИЯ ТОГГЛА ===
+        local function AddToggle(toggleName, default, callback)
+            local Frame = Instance.new("Frame")
+            Frame.Size = UDim2.new(1, 0, 0, 26)
+            Frame.BackgroundTransparency = 1
+            Frame.Parent = Page
+            Frame.ZIndex = 3
             
-            for i, option in ipairs(options) do
-                local OptionButton = Instance.new("TextButton")
-                OptionButton.Size = UDim2.new(1, 0, 0, 26)
-                OptionButton.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-                OptionButton.Text = "  " .. option
-                OptionButton.Font = Enum.Font.Gotham
-                OptionButton.TextColor3 = Color3.fromRGB(200, 200, 205)
-                OptionButton.TextSize = 12
-                OptionButton.TextXAlignment = Enum.TextXAlignment.Left
-                OptionButton.AutoButtonColor = false
-                OptionButton.Parent = OptionsContainer
-                OptionButton.ZIndex = 102
-                OptionButton.Modal = false
-                
-                OptionButton.MouseEnter:Connect(function()
-                    TweenService:Create(OptionButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(35, 35, 40)}):Play()
-                end)
-                
-                OptionButton.MouseLeave:Connect(function()
-                    TweenService:Create(OptionButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(20, 20, 25)}):Play()
-                end)
-                
-                OptionButton.MouseButton1Click:Connect(function()
-                    selectedValue = option
-                    DropdownButton.Text = option
+            local Text = Instance.new("TextLabel")
+            Text.Text = toggleName
+            Text.Font = Enum.Font.Gotham
+            Text.TextColor3 = Color3.fromRGB(180, 180, 185)
+            Text.TextSize = 13
+            Text.Size = UDim2.new(0.85, 0, 1, 0)
+            Text.BackgroundTransparency = 1
+            Text.TextXAlignment = 0
+            Text.Parent = Frame
+            Text.TextTruncate = Enum.TextTruncate.AtEnd
+            Text.ZIndex = 4
+            
+            local Sw = Instance.new("Frame")
+            Sw.Size = UDim2.new(0, 30, 0, 16)
+            Sw.Position = UDim2.new(1, -30, 0.5, -8)
+            Sw.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+            Sw.Parent = Frame
+            Sw.ZIndex = 4
+            Instance.new("UICorner", Sw).CornerRadius = UDim.new(1, 0)
+            
+            local D = Instance.new("Frame")
+            D.Size = UDim2.new(0, 10, 0, 10)
+            D.Position = UDim2.new(0, 3, 0.5, -5)
+            D.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
+            D.Parent = Sw
+            D.ZIndex = 5
+            Instance.new("UICorner", D).CornerRadius = UDim.new(1, 0)
+            
+            local val = default or false
+            local function update()
+                local goalCol = val and Color3.fromRGB(76, 110, 245) or Color3.fromRGB(60, 60, 65)
+                local goalPos = val and UDim2.new(1, -13, 0.5, -5) or UDim2.new(0, 3, 0.5, -5)
+                TweenService:Create(D, TweenInfo.new(0.3, Enum.EasingStyle.Quart), {BackgroundColor3 = goalCol, Position = goalPos}):Play()
+                TweenService:Create(Text, TweenInfo.new(0.3), {TextColor3 = val and Color3.fromRGB(255,255,255) or Color3.fromRGB(180,180,185)}):Play()
+                if callback then callback(val) end
+            end
+            
+            Frame.InputBegan:Connect(function(i) 
+                if i.UserInputType == Enum.UserInputType.MouseButton1 then 
+                    val = not val 
+                    update() 
+                end 
+            end)
+            
+            update()
+            
+            return {
+                SetValue = function(value)
+                    val = value
+                    update()
+                end,
+                GetValue = function()
+                    return val
+                end
+            }
+        end
+        
+        -- === ФУНКЦИЯ ДЛЯ СОЗДАНИЯ ДРОПДАУНА ===
+        local function AddDropdown(dropdownName, options, default, callback)
+            local Frame = Instance.new("Frame")
+            Frame.Size = UDim2.new(1, 0, 0, 26)
+            Frame.BackgroundTransparency = 1
+            Frame.Parent = Page
+            Frame.ClipsDescendants = false
+            Frame.ZIndex = 3
+            
+            local Text = Instance.new("TextLabel")
+            Text.Text = dropdownName
+            Text.Font = Enum.Font.Gotham
+            Text.TextColor3 = Color3.fromRGB(180, 180, 185)
+            Text.TextSize = 13
+            Text.Size = UDim2.new(0, 100, 1, 0)
+            Text.BackgroundTransparency = 1
+            Text.TextXAlignment = 0
+            Text.Parent = Frame
+            Text.TextTruncate = Enum.TextTruncate.AtEnd
+            Text.ZIndex = 4
+            
+            local DropdownButton = Instance.new("TextButton")
+            DropdownButton.Size = UDim2.new(0, 160, 0, 26)
+            DropdownButton.Position = UDim2.new(1, -160, 0, 0)
+            DropdownButton.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+            DropdownButton.Text = default or options[1]
+            DropdownButton.Font = Enum.Font.Gotham
+            DropdownButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            DropdownButton.TextSize = 12
+            DropdownButton.AutoButtonColor = false
+            DropdownButton.Parent = Frame
+            DropdownButton.ZIndex = 5
+            Instance.new("UICorner", DropdownButton).CornerRadius = UDim.new(0, 6)
+            
+            local Arrow = Instance.new("ImageLabel")
+            Arrow.Size = UDim2.new(0, 12, 0, 12)
+            Arrow.Position = UDim2.new(1, -18, 0.5, -6)
+            Arrow.BackgroundTransparency = 1
+            Arrow.Image = "rbxassetid://4910975533"
+            Arrow.ImageColor3 = Color3.fromRGB(150, 150, 155)
+            Arrow.Parent = DropdownButton
+            Arrow.ZIndex = 6
+            
+            local DropdownList = Instance.new("Frame")
+            DropdownList.Size = UDim2.new(0, 160, 0, 0)
+            DropdownList.Position = UDim2.new(1, -160, 1, 2)
+            DropdownList.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+            DropdownList.BorderSizePixel = 0
+            DropdownList.ClipsDescendants = true
+            DropdownList.Visible = false
+            DropdownList.Parent = Frame
+            DropdownList.ZIndex = 100
+            Instance.new("UICorner", DropdownList).CornerRadius = UDim.new(0, 6)
+            Instance.new("UIStroke", DropdownList).Color = Color3.fromRGB(35, 35, 40)
+            
+            local OptionsContainer = Instance.new("Frame")
+            OptionsContainer.Size = UDim2.new(1, -4, 1, 0)
+            OptionsContainer.Position = UDim2.new(0, 2, 0, 0)
+            OptionsContainer.BackgroundTransparency = 1
+            OptionsContainer.Parent = DropdownList
+            OptionsContainer.ZIndex = 101
+            
+            local UIListLayout = Instance.new("UIListLayout")
+            UIListLayout.Parent = OptionsContainer
+            UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+            
+            local selectedValue = default or options[1]
+            local isOpen = false
+            local optionButtons = {}
+            
+            local function CloseDropdown()
+                isOpen = false
+                DropdownList.Visible = false
+                TweenService:Create(DropdownList, TweenInfo.new(0.2), {Size = UDim2.new(0, 160, 0, 0)}):Play()
+                TweenService:Create(Arrow, TweenInfo.new(0.2), {Rotation = 0}):Play()
+            end
+            
+            local function OpenDropdown()
+                isOpen = true
+                DropdownList.Visible = true
+                local listHeight = math.min(#options * 26, 156)
+                TweenService:Create(DropdownList, TweenInfo.new(0.2), {Size = UDim2.new(0, 160, 0, listHeight)}):Play()
+                TweenService:Create(Arrow, TweenInfo.new(0.2), {Rotation = 180}):Play()
+            end
+            
+            DropdownButton.MouseButton1Click:Connect(function()
+                if isOpen then
                     CloseDropdown()
-                    if callback then
-                        callback(option)
+                else
+                    OpenDropdown()
+                end
+            end)
+            
+            local function CreateOptions()
+                for _, btn in ipairs(optionButtons) do
+                    btn:Destroy()
+                end
+                optionButtons = {}
+                
+                for i, option in ipairs(options) do
+                    local OptionButton = Instance.new("TextButton")
+                    OptionButton.Size = UDim2.new(1, 0, 0, 26)
+                    OptionButton.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+                    OptionButton.Text = "  " .. option
+                    OptionButton.Font = Enum.Font.Gotham
+                    OptionButton.TextColor3 = Color3.fromRGB(200, 200, 205)
+                    OptionButton.TextSize = 12
+                    OptionButton.TextXAlignment = Enum.TextXAlignment.Left
+                    OptionButton.AutoButtonColor = false
+                    OptionButton.Parent = OptionsContainer
+                    OptionButton.ZIndex = 102
+                    OptionButton.Modal = false
+                    
+                    OptionButton.MouseEnter:Connect(function()
+                        TweenService:Create(OptionButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(35, 35, 40)}):Play()
+                    end)
+                    
+                    OptionButton.MouseLeave:Connect(function()
+                        TweenService:Create(OptionButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(20, 20, 25)}):Play()
+                    end)
+                    
+                    OptionButton.MouseButton1Click:Connect(function()
+                        selectedValue = option
+                        DropdownButton.Text = option
+                        CloseDropdown()
+                        if callback then
+                            callback(option)
+                        end
+                    end)
+                    
+                    table.insert(optionButtons, OptionButton)
+                end
+            end
+            
+            CreateOptions()
+            
+            local function onInputBegan(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    local mousePos = UserInputService:GetMouseLocation()
+                    local dropdownPos = DropdownButton.AbsolutePosition
+                    local dropdownSize = DropdownButton.AbsoluteSize
+                    local listPos = DropdownList.AbsolutePosition
+                    local listSize = DropdownList.AbsoluteSize
+                    
+                    local isOverDropdown = mousePos.X >= dropdownPos.X and mousePos.X <= dropdownPos.X + dropdownSize.X and
+                                          mousePos.Y >= dropdownPos.Y and mousePos.Y <= dropdownPos.Y + dropdownSize.Y
+                    local isOverList = isOpen and mousePos.X >= listPos.X and mousePos.X <= listPos.X + listSize.X and
+                                       mousePos.Y >= listPos.Y and mousePos.Y <= listPos.Y + listSize.Y
+                    
+                    if not isOverDropdown and not isOverList and isOpen then
+                        CloseDropdown()
                     end
-                end)
-                
-                table.insert(optionButtons, OptionButton)
-            end
-        end
-        
-        CreateOptions()
-        
-        local function onInputBegan(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                local mousePos = UserInputService:GetMouseLocation()
-                local dropdownPos = DropdownButton.AbsolutePosition
-                local dropdownSize = DropdownButton.AbsoluteSize
-                local listPos = DropdownList.AbsolutePosition
-                local listSize = DropdownList.AbsoluteSize
-                
-                local isOverDropdown = mousePos.X >= dropdownPos.X and mousePos.X <= dropdownPos.X + dropdownSize.X and
-                                      mousePos.Y >= dropdownPos.Y and mousePos.Y <= dropdownPos.Y + dropdownSize.Y
-                local isOverList = isOpen and mousePos.X >= listPos.X and mousePos.X <= listPos.X + listSize.X and
-                                   mousePos.Y >= listPos.Y and mousePos.Y <= listPos.Y + listSize.Y
-                
-                if not isOverDropdown and not isOverList and isOpen then
-                    CloseDropdown()
                 end
             end
+            
+            UserInputService.InputBegan:Connect(onInputBegan)
+            
+            return {
+                SetValue = function(value)
+                    if table.find(options, value) then
+                        selectedValue = value
+                        DropdownButton.Text = value
+                        if callback then callback(value) end
+                    end
+                end,
+                GetValue = function()
+                    return selectedValue
+                end,
+                Refresh = function(newOptions)
+                    options = newOptions
+                    CreateOptions()
+                    if not table.find(options, selectedValue) and #options > 0 then
+                        selectedValue = options[1]
+                        DropdownButton.Text = options[1]
+                        if callback then callback(options[1]) end
+                    end
+                end
+            }
         end
         
-        UserInputService.InputBegan:Connect(onInputBegan)
-        
+        -- Возвращаем API для вкладки
         return {
-            SetValue = function(value)
-                if table.find(options, value) then
-                    selectedValue = value
-                    DropdownButton.Text = value
-                    if callback then callback(value) end
-                end
-            end,
-            GetValue = function()
-                return selectedValue
-            end,
-            Refresh = function(newOptions)
-                options = newOptions
-                CreateOptions()
-                if not table.find(options, selectedValue) and #options > 0 then
-                    selectedValue = options[1]
-                    DropdownButton.Text = options[1]
-                    if callback then callback(options[1]) end
-                end
-            end
+            AddToggle = AddToggle,
+            AddDropdown = AddDropdown
         }
     end
 
@@ -500,18 +505,16 @@ function StardustLib:CreateWindow(config)
     task.spawn(Inject)
     
     -- Активируем первую вкладку
-    local firstTab = next(tabs)
-    if firstTab then
-        tabs[firstTab].Btn.BackgroundTransparency = 0.9
-        tabs[firstTab].Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        tabs[firstTab].Page.Visible = true
+    local firstTabKey = next(tabs)
+    if firstTabKey then
+        tabs[firstTabKey].Btn.BackgroundTransparency = 0.9
+        tabs[firstTabKey].Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        tabs[firstTabKey].Page.Visible = true
     end
     
     -- Возвращаем API
     return {
         CreateTab = CreateTab,
-        AddToggle = AddToggle,
-        AddDropdown = AddDropdown,
         Window = Main,
         ScreenGui = ScreenGui
     }
