@@ -1,0 +1,520 @@
+-- Stardust UI Library
+-- Source.lua
+
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local CoreGui = game:GetService("CoreGui")
+
+local StardustLib = {}
+StardustLib.__index = StardustLib
+
+function StardustLib:CreateWindow(config)
+    config = config or {}
+    local Title = config.Title or "Stardust"
+    local SubTitle = config.SubTitle or "PRO"
+    
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = config.Name or "Stardust_Project"
+    ScreenGui.Parent = CoreGui
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    
+    -- === МИНИМАЛИСТИЧНЫЙ ЛОГОТИП ИНЖЕКТА ===
+    local SplashContainer = Instance.new("Frame")
+    SplashContainer.Name = "SplashContainer"
+    SplashContainer.Parent = ScreenGui
+    SplashContainer.Size = UDim2.new(0, 100, 0, 100)
+    SplashContainer.Position = UDim2.new(0.5, -50, 0.5, -50)
+    SplashContainer.BackgroundTransparency = 1
+    SplashContainer.ZIndex = 10
+
+    local LogoText = Instance.new("TextLabel")
+    LogoText.Parent = SplashContainer
+    LogoText.Size = UDim2.new(1, 0, 1, 0)
+    LogoText.BackgroundTransparency = 1
+    LogoText.Text = "S<font color='#4C6EF5'>D</font>"
+    LogoText.RichText = true
+    LogoText.Font = Enum.Font.GothamBold
+    LogoText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    LogoText.TextSize = 60
+    LogoText.TextTransparency = 1
+    LogoText.Rotation = -10
+
+    -- === ГЛАВНОЕ ОКНО ===
+    local Main = Instance.new("Frame")
+    Main.Name = "Main"
+    Main.Parent = ScreenGui
+    Main.BackgroundColor3 = Color3.fromRGB(13, 13, 15)
+    Main.Position = UDim2.new(0.5, -250, 0.5, -175)
+    Main.Size = UDim2.new(0, 500, 0, 350)
+    Main.BorderSizePixel = 0
+    Main.Visible = false
+    Main.ClipsDescendants = true
+    Main.ZIndex = 1
+    Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
+    Instance.new("UIStroke", Main).Color = Color3.fromRGB(30, 30, 35)
+
+    -- Боковая панель
+    local Sidebar = Instance.new("Frame")
+    Sidebar.Name = "Sidebar"
+    Sidebar.Parent = Main
+    Sidebar.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
+    Sidebar.Size = UDim2.new(0, 130, 1, 0)
+    Sidebar.BorderSizePixel = 0
+    Sidebar.ZIndex = 2
+    Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 10)
+
+    -- Контейнер для кнопок
+    local TabButtonsFrame = Instance.new("Frame")
+    TabButtonsFrame.Name = "TabButtonsFrame"
+    TabButtonsFrame.Parent = Sidebar
+    TabButtonsFrame.Size = UDim2.new(1, 0, 1, -70)
+    TabButtonsFrame.BackgroundTransparency = 1
+    TabButtonsFrame.ZIndex = 3
+
+    local TabList = Instance.new("UIListLayout")
+    TabList.Parent = TabButtonsFrame
+    TabList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    TabList.Padding = UDim.new(0, 8)
+    Instance.new("UIPadding", TabButtonsFrame).PaddingTop = UDim.new(0, 60)
+
+    -- === СИСТЕМА ПРОФИЛЯ ===
+    local ProfileFrame = Instance.new("Frame")
+    ProfileFrame.Name = "UserProfile"
+    ProfileFrame.Parent = Sidebar
+    ProfileFrame.Size = UDim2.new(1, 0, 0, 60)
+    ProfileFrame.Position = UDim2.new(0, 0, 1, -60)
+    ProfileFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+    ProfileFrame.BackgroundTransparency = 0.5
+    ProfileFrame.BorderSizePixel = 0
+    ProfileFrame.ZIndex = 3
+
+    local Avatar = Instance.new("ImageLabel")
+    Avatar.Name = "Avatar"
+    Avatar.Parent = ProfileFrame
+    Avatar.Position = UDim2.new(0, 10, 0.5, -18)
+    Avatar.Size = UDim2.new(0, 36, 0, 36)
+    Avatar.BackgroundTransparency = 1
+    Avatar.Image = Players:GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+    Avatar.ZIndex = 4
+    Instance.new("UICorner", Avatar).CornerRadius = UDim.new(1, 0)
+
+    local UserName = Instance.new("TextLabel")
+    UserName.Parent = ProfileFrame
+    UserName.Text = LocalPlayer.DisplayName
+    UserName.Font = Enum.Font.GothamBold
+    UserName.TextColor3 = Color3.fromRGB(255, 255, 255)
+    UserName.TextSize = 13
+    UserName.Position = UDim2.new(0, 52, 0.5, -16)
+    UserName.Size = UDim2.new(0, 70, 0, 16)
+    UserName.BackgroundTransparency = 1
+    UserName.TextXAlignment = Enum.TextXAlignment.Left
+    UserName.TextTruncate = Enum.TextTruncate.AtEnd
+    UserName.ZIndex = 4
+
+    local Rank = Instance.new("TextLabel")
+    Rank.Parent = ProfileFrame
+    Rank.Text = "Premium"
+    Rank.Font = Enum.Font.Gotham
+    Rank.TextColor3 = Color3.fromRGB(76, 110, 245)
+    Rank.TextSize = 11
+    Rank.Position = UDim2.new(0, 52, 0.5, 0)
+    Rank.Size = UDim2.new(0, 70, 0, 14)
+    Rank.BackgroundTransparency = 1
+    Rank.TextXAlignment = Enum.TextXAlignment.Left
+    Rank.ZIndex = 4
+
+    local Line = Instance.new("Frame")
+    Line.Size = UDim2.new(0.8, 0, 0, 1)
+    Line.Position = UDim2.new(0.1, 0, 0, 0)
+    Line.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+    Line.BorderSizePixel = 0
+    Line.Parent = ProfileFrame
+    Line.ZIndex = 4
+
+    -- Логотип в меню
+    local TitleLabel = Instance.new("TextLabel")
+    TitleLabel.Parent = Main
+    TitleLabel.Text = string.format("%s <font color='#4C6EF5'>%s</font>", Title:upper(), SubTitle:upper())
+    TitleLabel.RichText = true
+    TitleLabel.Font = Enum.Font.GothamBold
+    TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TitleLabel.TextSize = 14
+    TitleLabel.Position = UDim2.new(0, 20, 0, 20)
+    TitleLabel.Size = UDim2.new(0, 100, 0, 20)
+    TitleLabel.BackgroundTransparency = 1
+    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    TitleLabel.ZIndex = 2
+
+    local PageContainer = Instance.new("Frame")
+    PageContainer.Name = "Pages"
+    PageContainer.Parent = Main
+    PageContainer.Position = UDim2.new(0, 145, 0, 60)
+    PageContainer.Size = UDim2.new(1, -160, 1, -80)
+    PageContainer.BackgroundTransparency = 1
+    PageContainer.ClipsDescendants = false
+    PageContainer.ZIndex = 2
+
+    local tabs = {}
+    
+    -- === ФУНКЦИЯ ДЛЯ СОЗДАНИЯ ВКЛАДОК ===
+    local function CreateTab(name)
+        local Page = Instance.new("ScrollingFrame")
+        Page.Name = name .. "Page"
+        Page.Parent = PageContainer
+        Page.Size = UDim2.new(1, 0, 1, 0)
+        Page.BackgroundTransparency = 1
+        Page.Visible = false
+        Page.ScrollBarThickness = 0
+        Page.AutomaticCanvasSize = Enum.AutomaticSize.Y
+        Page.CanvasSize = UDim2.new(0, 0, 0, 0)
+        Page.ClipsDescendants = false
+        Page.ZIndex = 2
+        
+        local ListLayout = Instance.new("UIListLayout")
+        ListLayout.Parent = Page
+        ListLayout.Padding = UDim.new(0, 15)
+        ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+        local Btn = Instance.new("TextButton")
+        Btn.Name = name .. "Btn"
+        Btn.Parent = TabButtonsFrame
+        Btn.Size = UDim2.new(0, 110, 0, 32)
+        Btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        Btn.BackgroundTransparency = 1
+        Btn.Text = name
+        Btn.Font = Enum.Font.GothamMedium
+        Btn.TextColor3 = Color3.fromRGB(150, 150, 155)
+        Btn.TextSize = 13
+        Btn.TextTruncate = Enum.TextTruncate.AtEnd
+        Btn.AutoButtonColor = false
+        Btn.ZIndex = 3
+        Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 6)
+
+        Btn.MouseButton1Click:Connect(function()
+            for _, t in pairs(tabs) do
+                t.Page.Visible = false
+                TweenService:Create(t.Btn, TweenInfo.new(0.3), {TextColor3 = Color3.fromRGB(150, 150, 155), BackgroundTransparency = 1}):Play()
+            end
+            Page.Visible = true
+            TweenService:Create(Btn, TweenInfo.new(0.3), {TextColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 0.9}):Play()
+        end)
+
+        tabs[name] = {Page = Page, Btn = Btn}
+        return Page
+    end
+    
+    -- === ФУНКЦИЯ ДЛЯ СОЗДАНИЯ ТОГГЛА ===
+    local function AddToggle(parent, name, default, callback)
+        local Frame = Instance.new("Frame")
+        Frame.Size = UDim2.new(1, 0, 0, 26)
+        Frame.BackgroundTransparency = 1
+        Frame.Parent = parent
+        Frame.ZIndex = 3
+        
+        local Text = Instance.new("TextLabel")
+        Text.Text = name
+        Text.Font = Enum.Font.Gotham
+        Text.TextColor3 = Color3.fromRGB(180, 180, 185)
+        Text.TextSize = 13
+        Text.Size = UDim2.new(0.85, 0, 1, 0)
+        Text.BackgroundTransparency = 1
+        Text.TextXAlignment = 0
+        Text.Parent = Frame
+        Text.TextTruncate = Enum.TextTruncate.AtEnd
+        Text.ZIndex = 4
+        
+        local Sw = Instance.new("Frame")
+        Sw.Size = UDim2.new(0, 30, 0, 16)
+        Sw.Position = UDim2.new(1, -30, 0.5, -8)
+        Sw.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+        Sw.Parent = Frame
+        Sw.ZIndex = 4
+        Instance.new("UICorner", Sw).CornerRadius = UDim.new(1, 0)
+        
+        local D = Instance.new("Frame")
+        D.Size = UDim2.new(0, 10, 0, 10)
+        D.Position = UDim2.new(0, 3, 0.5, -5)
+        D.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
+        D.Parent = Sw
+        D.ZIndex = 5
+        Instance.new("UICorner", D).CornerRadius = UDim.new(1, 0)
+        
+        local val = default or false
+        local function update()
+            local goalCol = val and Color3.fromRGB(76, 110, 245) or Color3.fromRGB(60, 60, 65)
+            local goalPos = val and UDim2.new(1, -13, 0.5, -5) or UDim2.new(0, 3, 0.5, -5)
+            TweenService:Create(D, TweenInfo.new(0.3, Enum.EasingStyle.Quart), {BackgroundColor3 = goalCol, Position = goalPos}):Play()
+            TweenService:Create(Text, TweenInfo.new(0.3), {TextColor3 = val and Color3.fromRGB(255,255,255) or Color3.fromRGB(180,180,185)}):Play()
+            if callback then callback(val) end
+        end
+        
+        Frame.InputBegan:Connect(function(i) 
+            if i.UserInputType == Enum.UserInputType.MouseButton1 then 
+                val = not val 
+                update() 
+            end 
+        end)
+        
+        update()
+        
+        return {
+            SetValue = function(value)
+                val = value
+                update()
+            end,
+            GetValue = function()
+                return val
+            end
+        }
+    end
+    
+    -- === ФУНКЦИЯ ДЛЯ СОЗДАНИЯ ДРОПДАУНА ===
+    local function AddDropdown(parent, name, options, default, callback)
+        local Frame = Instance.new("Frame")
+        Frame.Size = UDim2.new(1, 0, 0, 26)
+        Frame.BackgroundTransparency = 1
+        Frame.Parent = parent
+        Frame.ClipsDescendants = false
+        Frame.ZIndex = 3
+        
+        local Text = Instance.new("TextLabel")
+        Text.Text = name
+        Text.Font = Enum.Font.Gotham
+        Text.TextColor3 = Color3.fromRGB(180, 180, 185)
+        Text.TextSize = 13
+        Text.Size = UDim2.new(0, 100, 1, 0)
+        Text.BackgroundTransparency = 1
+        Text.TextXAlignment = 0
+        Text.Parent = Frame
+        Text.TextTruncate = Enum.TextTruncate.AtEnd
+        Text.ZIndex = 4
+        
+        local DropdownButton = Instance.new("TextButton")
+        DropdownButton.Size = UDim2.new(0, 160, 0, 26)
+        DropdownButton.Position = UDim2.new(1, -160, 0, 0)
+        DropdownButton.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+        DropdownButton.Text = default or options[1]
+        DropdownButton.Font = Enum.Font.Gotham
+        DropdownButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        DropdownButton.TextSize = 12
+        DropdownButton.AutoButtonColor = false
+        DropdownButton.Parent = Frame
+        DropdownButton.ZIndex = 5
+        Instance.new("UICorner", DropdownButton).CornerRadius = UDim.new(0, 6)
+        
+        local Arrow = Instance.new("ImageLabel")
+        Arrow.Size = UDim2.new(0, 12, 0, 12)
+        Arrow.Position = UDim2.new(1, -18, 0.5, -6)
+        Arrow.BackgroundTransparency = 1
+        Arrow.Image = "rbxassetid://4910975533"
+        Arrow.ImageColor3 = Color3.fromRGB(150, 150, 155)
+        Arrow.Parent = DropdownButton
+        Arrow.ZIndex = 6
+        
+        local DropdownList = Instance.new("Frame")
+        DropdownList.Size = UDim2.new(0, 160, 0, 0)
+        DropdownList.Position = UDim2.new(1, -160, 1, 2)
+        DropdownList.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+        DropdownList.BorderSizePixel = 0
+        DropdownList.ClipsDescendants = true
+        DropdownList.Visible = false
+        DropdownList.Parent = Frame
+        DropdownList.ZIndex = 100
+        Instance.new("UICorner", DropdownList).CornerRadius = UDim.new(0, 6)
+        Instance.new("UIStroke", DropdownList).Color = Color3.fromRGB(35, 35, 40)
+        
+        local OptionsContainer = Instance.new("Frame")
+        OptionsContainer.Size = UDim2.new(1, -4, 1, 0)
+        OptionsContainer.Position = UDim2.new(0, 2, 0, 0)
+        OptionsContainer.BackgroundTransparency = 1
+        OptionsContainer.Parent = DropdownList
+        OptionsContainer.ZIndex = 101
+        
+        local UIListLayout = Instance.new("UIListLayout")
+        UIListLayout.Parent = OptionsContainer
+        UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        
+        local selectedValue = default or options[1]
+        local isOpen = false
+        local optionButtons = {}
+        
+        local function CloseDropdown()
+            isOpen = false
+            DropdownList.Visible = false
+            TweenService:Create(DropdownList, TweenInfo.new(0.2), {Size = UDim2.new(0, 160, 0, 0)}):Play()
+            TweenService:Create(Arrow, TweenInfo.new(0.2), {Rotation = 0}):Play()
+        end
+        
+        local function OpenDropdown()
+            isOpen = true
+            DropdownList.Visible = true
+            local listHeight = math.min(#options * 26, 156)
+            TweenService:Create(DropdownList, TweenInfo.new(0.2), {Size = UDim2.new(0, 160, 0, listHeight)}):Play()
+            TweenService:Create(Arrow, TweenInfo.new(0.2), {Rotation = 180}):Play()
+        end
+        
+        DropdownButton.MouseButton1Click:Connect(function()
+            if isOpen then
+                CloseDropdown()
+            else
+                OpenDropdown()
+            end
+        end)
+        
+        local function CreateOptions()
+            for _, btn in ipairs(optionButtons) do
+                btn:Destroy()
+            end
+            optionButtons = {}
+            
+            for i, option in ipairs(options) do
+                local OptionButton = Instance.new("TextButton")
+                OptionButton.Size = UDim2.new(1, 0, 0, 26)
+                OptionButton.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+                OptionButton.Text = "  " .. option
+                OptionButton.Font = Enum.Font.Gotham
+                OptionButton.TextColor3 = Color3.fromRGB(200, 200, 205)
+                OptionButton.TextSize = 12
+                OptionButton.TextXAlignment = Enum.TextXAlignment.Left
+                OptionButton.AutoButtonColor = false
+                OptionButton.Parent = OptionsContainer
+                OptionButton.ZIndex = 102
+                OptionButton.Modal = false
+                
+                OptionButton.MouseEnter:Connect(function()
+                    TweenService:Create(OptionButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(35, 35, 40)}):Play()
+                end)
+                
+                OptionButton.MouseLeave:Connect(function()
+                    TweenService:Create(OptionButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(20, 20, 25)}):Play()
+                end)
+                
+                OptionButton.MouseButton1Click:Connect(function()
+                    selectedValue = option
+                    DropdownButton.Text = option
+                    CloseDropdown()
+                    if callback then
+                        callback(option)
+                    end
+                end)
+                
+                table.insert(optionButtons, OptionButton)
+            end
+        end
+        
+        CreateOptions()
+        
+        local function onInputBegan(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                local mousePos = UserInputService:GetMouseLocation()
+                local dropdownPos = DropdownButton.AbsolutePosition
+                local dropdownSize = DropdownButton.AbsoluteSize
+                local listPos = DropdownList.AbsolutePosition
+                local listSize = DropdownList.AbsoluteSize
+                
+                local isOverDropdown = mousePos.X >= dropdownPos.X and mousePos.X <= dropdownPos.X + dropdownSize.X and
+                                      mousePos.Y >= dropdownPos.Y and mousePos.Y <= dropdownPos.Y + dropdownSize.Y
+                local isOverList = isOpen and mousePos.X >= listPos.X and mousePos.X <= listPos.X + listSize.X and
+                                   mousePos.Y >= listPos.Y and mousePos.Y <= listPos.Y + listSize.Y
+                
+                if not isOverDropdown and not isOverList and isOpen then
+                    CloseDropdown()
+                end
+            end
+        end
+        
+        UserInputService.InputBegan:Connect(onInputBegan)
+        
+        return {
+            SetValue = function(value)
+                if table.find(options, value) then
+                    selectedValue = value
+                    DropdownButton.Text = value
+                    if callback then callback(value) end
+                end
+            end,
+            GetValue = function()
+                return selectedValue
+            end,
+            Refresh = function(newOptions)
+                options = newOptions
+                CreateOptions()
+                if not table.find(options, selectedValue) and #options > 0 then
+                    selectedValue = options[1]
+                    DropdownButton.Text = options[1]
+                    if callback then callback(options[1]) end
+                end
+            end
+        }
+    end
+
+    -- === ЛОГИКА АНИМАЦИИ ИНЖЕКТА ===
+    local function Inject()
+        TweenService:Create(LogoText, TweenInfo.new(1, Enum.EasingStyle.Quart), {TextTransparency = 0, Rotation = 0}):Play()
+        task.wait(1.5)
+        TweenService:Create(LogoText, TweenInfo.new(0.6, Enum.EasingStyle.Back), {Position = UDim2.new(0, 0, 0, -50), TextTransparency = 1}):Play()
+        task.wait(0.4)
+        Main.Visible = true
+        Main.Size = UDim2.new(0, 0, 0, 0)
+        Main.Position = UDim2.new(0.5, 0, 0.5, 0)
+        TweenService:Create(Main, TweenInfo.new(0.7, Enum.EasingStyle.Back), {
+            Size = UDim2.new(0, 500, 0, 350),
+            Position = UDim2.new(0.5, -250, 0.5, -175)
+        }):Play()
+        SplashContainer:Destroy()
+    end
+
+    -- Drag & Keybind
+    local d, ds, sp
+    Main.InputBegan:Connect(function(i) 
+        if i.UserInputType == Enum.UserInputType.MouseButton1 then 
+            d = true
+            ds = i.Position
+            sp = Main.Position 
+        end 
+    end)
+
+    UserInputService.InputChanged:Connect(function(i) 
+        if d and i.UserInputType == Enum.UserInputType.MouseMovement then 
+            local del = i.Position - ds
+            Main.Position = UDim2.new(sp.X.Scale, sp.X.Offset + del.X, sp.Y.Scale, sp.Y.Offset + del.Y) 
+        end 
+    end)
+
+    UserInputService.InputEnded:Connect(function(i) 
+        if i.UserInputType == Enum.UserInputType.MouseButton1 then 
+            d = false 
+        end 
+    end)
+
+    UserInputService.InputBegan:Connect(function(i, g) 
+        if not g and i.KeyCode == Enum.KeyCode.Insert then 
+            Main.Visible = not Main.Visible 
+        end 
+    end)
+
+    -- Старт
+    task.spawn(Inject)
+    
+    -- Активируем первую вкладку
+    local firstTab = next(tabs)
+    if firstTab then
+        tabs[firstTab].Btn.BackgroundTransparency = 0.9
+        tabs[firstTab].Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        tabs[firstTab].Page.Visible = true
+    end
+    
+    -- Возвращаем API
+    return {
+        CreateTab = CreateTab,
+        AddToggle = AddToggle,
+        AddDropdown = AddDropdown,
+        Window = Main,
+        ScreenGui = ScreenGui
+    }
+end
+
+return StardustLib
